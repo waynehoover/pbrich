@@ -75,21 +75,6 @@ curl -s https://example.com | pbrich -t public.html
 echo "**bold** and *italic*" | pandoc -f markdown -t html | pbrich -t public.html -p "bold and italic"
 ```
 
-## Auto-Detection
-
-When no `--type` is specified, pbrich detects the format from the content:
-
-| Format | Magic Bytes | Detected Type |
-| --- | --- | --- |
-| PNG | `89 50 4E 47` | `public.png` |
-| JPEG | `FF D8 FF` | `public.jpeg` |
-| PDF | `%PDF` | `com.adobe.pdf` |
-| TIFF | `49 49 2A 00` / `4D 4D 00 2A` | `public.tiff` |
-| RTF | `{\rtf` | `public.rtf` |
-| Everything else | | `public.utf8-plain-text` |
-
-Use `-t` to override detection or for formats without magic bytes (HTML, JSON, XML, etc.).
-
 ## Options
 
 | Flag | Description |
@@ -123,15 +108,6 @@ Run `pbrich --list-types` to see this list in your terminal.
 ## History
 
 View the [changelog](CHANGELOG.md).
-
-## Contributing
-
-Everyone is encouraged to help improve this project. Here are a few ways you can help:
-
-- [Report bugs](https://github.com/waynehoover/pbrich/issues)
-- Fix bugs and [submit pull requests](https://github.com/waynehoover/pbrich/pulls)
-- Write, clarify, or fix documentation
-- Suggest or add new features
 
 ## License
 
