@@ -6,7 +6,7 @@ public struct PBRichCommand: ParsableCommand {
     public static let configuration = CommandConfiguration(
         commandName: "pbrich",
         abstract: "Copy to macOS pasteboard with support for arbitrary types.",
-        version: "1.1.0"
+        version: "1.2.0"
     )
 
     @Option(name: .shortAndLong, help: "Pasteboard type UTI (can be specified multiple times). Auto-detected from content if omitted.")
