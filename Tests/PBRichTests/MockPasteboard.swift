@@ -6,12 +6,14 @@ class MockPasteboard: PasteboardWriter {
     var declaredTypes: [NSPasteboard.PasteboardType] = []
     var dataEntries: [(Data, NSPasteboard.PasteboardType)] = []
     var stringEntries: [(String, NSPasteboard.PasteboardType)] = []
+    var writtenObjects: [NSPasteboardWriting] = []
 
     func clearContents() {
         cleared = true
         declaredTypes = []
         dataEntries = []
         stringEntries = []
+        writtenObjects = []
     }
 
     func declareTypes(_ types: [NSPasteboard.PasteboardType]) {
@@ -26,5 +28,9 @@ class MockPasteboard: PasteboardWriter {
     func setString(_ string: String, forType type: NSPasteboard.PasteboardType) -> Bool {
         stringEntries.append((string, type))
         return true
+    }
+
+    func writeObjects(_ objects: [NSPasteboardWriting]) {
+        writtenObjects.append(contentsOf: objects)
     }
 }

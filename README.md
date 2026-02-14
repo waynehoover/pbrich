@@ -62,6 +62,18 @@ Set multiple types at once:
 echo "<b>bold</b>" | pbrich -t public.html -t public.rtf
 ```
 
+Copy a file reference (paste into Finder, email attachments, etc.):
+
+```sh
+pbrich -f screenshot.png
+```
+
+Copy multiple files:
+
+```sh
+pbrich -f report.pdf -f summary.pdf
+```
+
 Combine with other tools:
 
 ```sh
@@ -73,6 +85,9 @@ curl -s https://example.com | pbrich -t public.html
 
 # Convert markdown to HTML and copy as rich text
 echo "**bold** and *italic*" | pandoc -f markdown -t html | pbrich -t public.html -p "bold and italic"
+
+# Screenshot a window and copy the file to paste as an attachment
+screencapture -w -o /tmp/shot.png && pbrich -f /tmp/shot.png
 ```
 
 ## Options
@@ -81,6 +96,7 @@ echo "**bold** and *italic*" | pandoc -f markdown -t html | pbrich -t public.htm
 | --- | --- |
 | `-t`, `--type` | Pasteboard type UTI (can be repeated). Overrides auto-detection |
 | `-p`, `--plain` | Also set a plain text fallback |
+| `-f`, `--file` | Copy file reference(s) to clipboard (like Cmd+C in Finder). Can be repeated |
 | `-l`, `--list-types` | List common pasteboard types |
 | `-v`, `--version` | Show version |
 | `-h`, `--help` | Show help |
@@ -104,6 +120,12 @@ Any [Uniform Type Identifier](https://developer.apple.com/documentation/uniformt
 | `public.xml` | XML | `cat data.xml \| pbrich -t public.xml` |
 
 Run `pbrich --list-types` to see this list in your terminal.
+
+## Similar Projects
+
+- **[pbcopy](https://ss64.com/mac/pbcopy.html)** (built-in macOS) — Copies stdin to the clipboard as plain text only. Cannot handle images, HTML, RTF, or other rich types.
+- **[pbv / macos-pasteboard](https://github.com/chbrown/macos-pasteboard)** — Reads rich pasteboard types from the clipboard (the reverse direction).
+- **[cpfile](https://github.com/ChrisVo/cpfile)** — Copies file references to the clipboard via AppleScript (like Cmd+C in Finder).
 
 ## History
 

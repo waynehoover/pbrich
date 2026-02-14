@@ -15,6 +15,9 @@ public struct PBRichCommand: ParsableCommand {
     @Option(name: .shortAndLong, help: "Plain text fallback to set alongside the specified type(s).")
     public var plain: String?
 
+    @Option(name: .shortAndLong, help: "Copy file reference(s) to clipboard (like Cmd+C in Finder). Can be repeated.")
+    public var file: [String] = []
+
     @Flag(name: .shortAndLong, help: "List common pasteboard types.")
     public var listTypes = false
 
@@ -25,11 +28,20 @@ public struct PBRichCommand: ParsableCommand {
 
     public init() {}
 
-    public func validate() throws {}
+    public func validate() throws {
+        if !file.isEmpty && !type.isEmpty {
+            throw ValidationError("--file cannot be combined with --type.")
+        }
+    }
 
     public func run() throws {
         if listTypes {
             printTypes()
+            return
+        }
+
+        if !file.isEmpty {
+            try copyFileReferences()
             return
         }
 
@@ -54,6 +66,31 @@ public struct PBRichCommand: ParsableCommand {
         for t in types {
             _ = pb.setData(data, forType: t)
         }
+
+        if let plain {
+            _ = pb.setString(plain, forType: .string)
+        }
+    }
+
+    private func copyFileReferences() throws {
+        let fm = FileManager.default
+        var urls: [NSURL] = []
+
+        for path in file {
+            let resolved = NSString(string: path).expandingTildeInPath
+            let absolute =
+                resolved.hasPrefix("/")
+                ? resolved
+                : fm.currentDirectoryPath + "/" + resolved
+            guard fm.fileExists(atPath: absolute) else {
+                throw ValidationError("File not found: \(path)")
+            }
+            urls.append(NSURL(fileURLWithPath: absolute))
+        }
+
+        let pb = Self.pasteboard
+        pb.clearContents()
+        pb.writeObjects(urls)
 
         if let plain {
             _ = pb.setString(plain, forType: .string)

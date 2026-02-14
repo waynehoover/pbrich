@@ -196,4 +196,70 @@ final class PBRichCommandTests: XCTestCase {
         XCTAssertEqual(mock.dataEntries.count, 1)
         XCTAssertTrue(mock.dataEntries[0].0.isEmpty)
     }
+
+    // MARK: - File Reference
+
+    func testFileFlagParsing() throws {
+        let command = try PBRichCommand.parse(["-f", "/tmp/test.png"])
+        XCTAssertEqual(command.file, ["/tmp/test.png"])
+    }
+
+    func testMultipleFileFlags() throws {
+        let command = try PBRichCommand.parse(["-f", "/tmp/a.png", "-f", "/tmp/b.pdf"])
+        XCTAssertEqual(command.file, ["/tmp/a.png", "/tmp/b.pdf"])
+    }
+
+    func testFileWithTypeIsInvalid() throws {
+        XCTAssertThrowsError(
+            try PBRichCommand.parseAsRoot(["-f", "/tmp/test.png", "-t", "public.html"])
+        )
+    }
+
+    func testFileCopiesFileReference() throws {
+        let tmp = NSTemporaryDirectory() + "pbrich-test-\(UUID().uuidString).txt"
+        FileManager.default.createFile(atPath: tmp, contents: "hello".data(using: .utf8))
+        defer { try? FileManager.default.removeItem(atPath: tmp) }
+
+        let command = try PBRichCommand.parse(["-f", tmp])
+        try command.run()
+
+        XCTAssertTrue(mock.cleared)
+        XCTAssertEqual(mock.writtenObjects.count, 1)
+        let url = mock.writtenObjects[0] as? NSURL
+        XCTAssertEqual(url?.path, tmp)
+    }
+
+    func testMultipleFileCopiesMultipleReferences() throws {
+        let tmp1 = NSTemporaryDirectory() + "pbrich-test-\(UUID().uuidString).txt"
+        let tmp2 = NSTemporaryDirectory() + "pbrich-test-\(UUID().uuidString).txt"
+        FileManager.default.createFile(atPath: tmp1, contents: "a".data(using: .utf8))
+        FileManager.default.createFile(atPath: tmp2, contents: "b".data(using: .utf8))
+        defer {
+            try? FileManager.default.removeItem(atPath: tmp1)
+            try? FileManager.default.removeItem(atPath: tmp2)
+        }
+
+        let command = try PBRichCommand.parse(["-f", tmp1, "-f", tmp2])
+        try command.run()
+
+        XCTAssertEqual(mock.writtenObjects.count, 2)
+    }
+
+    func testFileWithPlainFallback() throws {
+        let tmp = NSTemporaryDirectory() + "pbrich-test-\(UUID().uuidString).txt"
+        FileManager.default.createFile(atPath: tmp, contents: "hello".data(using: .utf8))
+        defer { try? FileManager.default.removeItem(atPath: tmp) }
+
+        let command = try PBRichCommand.parse(["-f", tmp, "-p", "fallback"])
+        try command.run()
+
+        XCTAssertEqual(mock.writtenObjects.count, 1)
+        XCTAssertEqual(mock.stringEntries.count, 1)
+        XCTAssertEqual(mock.stringEntries[0].0, "fallback")
+    }
+
+    func testFileNotFoundThrows() throws {
+        let command = try PBRichCommand.parse(["-f", "/nonexistent/file.txt"])
+        XCTAssertThrowsError(try command.run())
+    }
 }

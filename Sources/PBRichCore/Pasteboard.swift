@@ -5,6 +5,7 @@ public protocol PasteboardWriter {
     func declareTypes(_ types: [NSPasteboard.PasteboardType])
     @discardableResult func setData(_ data: Data, forType type: NSPasteboard.PasteboardType) -> Bool
     @discardableResult func setString(_ string: String, forType type: NSPasteboard.PasteboardType) -> Bool
+    func writeObjects(_ objects: [NSPasteboardWriting])
 }
 
 public struct SystemPasteboardWriter: PasteboardWriter {
@@ -28,5 +29,9 @@ public struct SystemPasteboardWriter: PasteboardWriter {
 
     public func setString(_ string: String, forType type: NSPasteboard.PasteboardType) -> Bool {
         pb.setString(string, forType: type)
+    }
+
+    public func writeObjects(_ objects: [NSPasteboardWriting]) {
+        pb.writeObjects(objects)
     }
 }
