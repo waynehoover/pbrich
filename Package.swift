@@ -13,9 +13,17 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "pbrich",
+            dependencies: ["PBRichCore"]
+        ),
+        .target(
+            name: "PBRichCore",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser")
             ]
+        ),
+        .testTarget(
+            name: "PBRichTests",
+            dependencies: ["PBRichCore"]
         )
     ]
 )
